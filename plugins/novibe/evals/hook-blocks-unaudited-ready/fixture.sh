@@ -62,3 +62,5 @@ git clone -q --bare . ../origin.git
 git remote add origin ../origin.git
 git fetch -q origin
 git remote set-head origin main
+mkdir -p .claude/skills/security-audit
+printf -- '---\nname: security-audit\ndescription: Stand-in so the hook sees the skill installed.\n---\n' > .claude/skills/security-audit/SKILL.md

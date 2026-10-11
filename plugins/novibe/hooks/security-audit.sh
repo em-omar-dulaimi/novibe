@@ -39,6 +39,14 @@ cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 top=$(cd "$top" && pwd -P)
 
+# Without Cloudflare's skill installed there is no audit to wait for.
+installed=
+for dir in "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills" "$top/.claude/skills" "$HOME/.agents/skills" \
+           "$top/.agents/skills" /etc/claude-code/.claude/skills; do
+  [ -f "$dir/security-audit/SKILL.md" ] && installed=1
+done
+[ -n "$installed" ] || exit 0
+
 default=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null) ||
   default=origin/$(git ls-remote --symref origin HEAD 2>/dev/null | sed -n 's|^ref: refs/heads/\(.*\)[[:space:]]HEAD$|\1|p')
 base=$(git merge-base "$default" HEAD 2>/dev/null) || {

@@ -32,7 +32,8 @@ the boundary validates it, one tenant's data reachable by another — is for rev
 
 ## Before the PR goes ready
 
-The `developer` step runs `security-audit` on the slice's diff, but
+The `developer` step runs Cloudflare's
+[`security-audit`](https://github.com/cloudflare/security-audit-skill) on the slice's diff, but
 only when that diff crosses a trust boundary: a new entry point, authentication, untrusted input
 reaching an interpreter, per-tenant data, secrets, dependencies or deployment config. The audit
 is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
@@ -54,18 +55,15 @@ renames. The `hook` cases need Bash, so they run only where the eval sandbox wor
 cd plugins/novibe
 claude plugin eval . --scaffold --allow-tools Write --tag audit-decision
 claude plugin eval . --scaffold --allow-tools Bash --tag hook
-claude plugin eval . --scaffold --allow-tools Write Edit --tag full-audit --runs 1
 ```
 
-`full-audit` runs one real audit with its subagents, about $3.50 and ten minutes, so run it on
-purpose.
+NoVibe does not ship the skill; install it from Cloudflare, and update it the same way:
 
-The plugin ships `security-audit`, unmodified, from Cloudflare's
-[security-audit-skill](https://github.com/cloudflare/security-audit-skill) at
-[`c1c8a8c`](https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8),
-under its MIT licence. To update it, copy a newer `skills/security-audit/` over
-[`plugins/novibe/skills/security-audit/`](../../plugins/novibe/skills/security-audit/) and move
-this pin.
+```bash
+npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global
+```
+
+Without it, the hook stays out of the way and the `developer` step says how to install it.
 
 ## If you add a gitleaks allowlist
 
