@@ -47,7 +47,13 @@ file. The hook reads the command and the run's metadata with `jq`; a `--draft` o
 driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
 `AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`.
 
-[`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks both. The `audit-decision` cases
+[`security-audit.test.sh`](../../plugins/novibe/hooks/security-audit.test.sh) keeps every way the
+hook has been found wrong, from a route in an ordinary file to a quoted `gh pr "ready"`. CI runs
+it on every change to the hook. The hook guards against an agent forgetting the audit, not against
+someone set on evading it, so it errs toward blocking; it is not a shell parser, and
+`bash -c "gh pr ready"` gets past it.
+
+[`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks the developer step's judgment. The `audit-decision` cases
 check that the developer step audits a slice adding an unguarded route and skips one that only
 renames. The `hook` cases need Bash, so they run only where the eval sandbox works:
 

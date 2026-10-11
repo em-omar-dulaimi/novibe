@@ -1,0 +1,17 @@
+name: hooks
+
+on:
+  pull_request:
+    paths: [plugins/novibe/hooks/**]
+  push:
+    branches: [main]
+    paths: [plugins/novibe/hooks/**]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh plugins/novibe/hooks/security-audit.test.sh
