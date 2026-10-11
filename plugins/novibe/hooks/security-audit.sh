@@ -1,20 +1,40 @@
 #!/bin/sh
 # Hold a PR back from ready while its diff crosses a trust boundary that no finished audit has covered.
 input=$(cat)
-printf '%s' "$input" | grep -Eq 'gh pr (ready|create)' || exit 0
+printf '%s' "$input" | grep -q 'gh' || exit 0
 command -v jq >/dev/null || {
   echo "The security-audit guard needs jq to read this command; install jq." >&2
   exit 2
 }
 
-# The command's first line, continuations joined, quoted text and heredoc bodies dropped: flags only.
-plain=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' |
-  sed -e ':a' -e '/\\$/{N;s/\\\n/ /;ba' -e '}' | head -n 1 |
-  sed -e "s/'[^']*'//g" -e 's/"[^"]*"//g' -e "s/[\"'].*//")
-printf '%s' "$plain" | grep -Eq 'gh pr (ready|create)' || exit 0
-printf '%s' "$plain" | grep -Eq '(^|[;&|[:space:]])ALLOW_NO_AUDIT=1[[:space:]]+gh pr' && exit 0
-printf '%s' "$plain" | grep -Eq 'gh pr ready' ||
-  ! printf '%s' "$plain" | grep -Eq 'gh pr create([[:space:]].*)?[[:space:]](--draft|-d)([[:space:]=]|$)' || exit 0
+# Every simple command in the input, heredoc bodies and quoted text dropped: is one a guarded gh pr call?
+guarded=$(printf '%s\n' "$input" | jq -r '.tool_input.command // empty' | awk '
+  heredoc != "" { t = $0; if (strip) sub(/^\t+/, "", t); if (t == heredoc) heredoc = ""; next }
+  {
+    line = cont $0; cont = ""
+    if (line ~ /\\$/) { cont = substr(line, 1, length(line) - 1) " "; next }
+    if (match(line, /<<-?[ \t]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/)) {
+      heredoc = substr(line, RSTART, RLENGTH); strip = heredoc ~ /^<<-/
+      sub(/^<<-?[ \t]*[\047"]?/, "", heredoc)
+    }
+    gsub(/\047[^\047]*\047/, "", line); gsub(/"[^"]*"/, "", line); sub(/[\047"].*/, "", line)
+    n = split(line, segs, /;|&&|\|\||\||&|\(|\)|`/)
+    for (s = 1; s <= n; s++) {
+      m = split(segs[s], tok, /[ \t]+/); i = 1; override = 0
+      while (i <= m && (tok[i] == "" || tok[i] == "env" || tok[i] == "command" || tok[i] ~ /^[A-Za-z_][A-Za-z0-9_]*=/)) {
+        if (tok[i] == "ALLOW_NO_AUDIT=1") override = 1
+        i++
+      }
+      if (tok[i] !~ /(^|\/)gh$/) continue
+      for (j = i + 1; j < m && tok[j] != "pr"; j++) ;
+      if (tok[j] != "pr" || (tok[j + 1] != "ready" && tok[j + 1] != "create")) continue
+      draft = 0
+      for (k = j + 2; k <= m; k++) if (tok[k] == "--draft" || tok[k] == "-d" || tok[k] ~ /^--draft=/) draft = 1
+      if (tok[j + 1] == "create" && draft) continue
+      if (!override) print "guard"
+    }
+  }')
+[ -n "$guarded" ] || exit 0
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 top=$(cd "$top" && pwd -P)
@@ -31,16 +51,19 @@ path_pattern="${AUDIT_PATHS:-(auth|login|session|token|crypt|secret|permission|a
 line_pattern="${AUDIT_LINES:-((app|router|server|fastify)\.(get|post|put|patch|delete|all|use|route)\(|@(app|router|bp|blueprint)\.(route|get|post|put|patch|delete)\(|@(get|post|put|patch|delete|requestmapping)(mapping)?\(|child_process|subprocess|exec\(|spawn\(|eval\(|innerhtml|dangerouslysetinnerhtml|pickle\.loads|yaml\.load\(|(select|insert|update|delete) .*(from|into|set|where) |verify ?= ?false|rejectunauthorized|access-control-allow|httponly|samesite|jwt|bcrypt|password)}"
 files=$(git diff --name-only "$base"..HEAD | while IFS= read -r file; do
   if printf '%s\n' "$file" | grep -Eiq "$path_pattern" ||
-     git diff "$base"..HEAD -- "$file" | grep -E '^\+[^+]' | grep -Eiq "$line_pattern"; then
+     git diff "$base"..HEAD -- "$file" | grep -E '^[+-]' | grep -Ev '^(\+\+\+|---)( |$)' | grep -Eiq "$line_pattern"; then
     printf '%s\n' "$file"
   fi
 done)
 [ -n "$files" ] || exit 0
 
-# A run counts only if it finished, audited this repository at a commit on the slice, and covers every flagged file.
+# A run counts only if it finished with its reports, audited this repository at a commit on the slice, and covers every flagged file.
 covers() {
   meta=$1
   [ "$(jq -r '.run_status // empty' "$meta")" = complete ] || return 1
+  for report in findings.json REPORT.md FINDINGS-DETAIL.md NEEDS-VALIDATION.md; do
+    [ -s "$(dirname "$meta")/$report" ] || return 1
+  done
   target=$(jq -r '.target // empty' "$meta")
   [ -n "$target" ] && [ "$(cd "$target" 2>/dev/null && pwd -P)" = "$top" ] || return 1
   on_slice=
