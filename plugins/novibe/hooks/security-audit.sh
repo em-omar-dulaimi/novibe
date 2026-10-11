@@ -13,8 +13,13 @@ for dir in "$HOME/.claude/skills" .claude/skills "$HOME/.agents/skills" .agents/
 done
 [ -n "$installed" ] || exit 0
 
-default=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
-base=$(git merge-base "$default" HEAD 2>/dev/null) || exit 0
+default=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null) ||
+  default=origin/$(git ls-remote --symref origin HEAD 2>/dev/null | sed -n 's|^ref: refs/heads/\(.*\)[[:space:]]HEAD$|\1|p')
+base=$(git merge-base "$default" HEAD 2>/dev/null) || {
+  echo "Cannot find where this slice branched from the default branch, so cannot tell whether it needs a security audit." >&2
+  echo "Run: git remote set-head origin --auto && git fetch origin" >&2
+  exit 2
+}
 
 paths=$(git diff --name-only "$base"..HEAD | grep -Ei "${AUDIT_PATHS:-(auth|login|session|token|crypt|secret|permission|acl|tenant|middleware|route|handler|webhook|cors|cookie|prompt|\.github/workflows/|dockerfile|\.tf$|wrangler\.|package\.json$|requirements.*\.txt$|go\.mod$|cargo\.toml$|pyproject\.toml$)}" || true)
 lines=$(git diff "$base"..HEAD | grep -E '^\+[^+]' | grep -Ei "${AUDIT_LINES:-(child_process|subprocess|exec\(|spawn\(|eval\(|innerhtml|dangerouslysetinnerhtml|pickle\.loads|yaml\.load\(|(select|insert|update|delete) .*(from|into|set|where) |verify ?= ?false|rejectunauthorized|access-control-allow|httponly|samesite|jwt|bcrypt|password)}" | head -5 || true)
