@@ -39,8 +39,8 @@ reaching an interpreter, per-tenant data, secrets, dependencies or deployment co
 is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
 
 The plugin's `PreToolUse` hook keeps that from being skipped by mistake. It holds back
-`gh pr ready` and `gh pr create` when the slice's diff touches boundary-looking paths or lines and
-no run in `~/security-audit-skill/` audited a commit on the slice. Override after asking the
+`gh pr ready` and a non-draft `gh pr create` when the slice's diff touches boundary-looking
+paths or lines and no completed run in `~/security-audit-skill/` audited a commit on the slice. Override after asking the
 driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
 `AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`. Without the skill installed, the hook
 stays out of the way.

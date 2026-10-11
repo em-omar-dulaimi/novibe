@@ -1,7 +1,9 @@
 #!/bin/sh
-# Hold a PR back from ready while its diff crosses a trust boundary that no audit has covered.
+# Hold a PR back from ready while its diff crosses a trust boundary that no finished audit has covered.
 input=$(cat)
 printf '%s' "$input" | grep -Eq 'gh pr (ready|create)' || exit 0
+printf '%s' "$input" | grep -Eq 'gh pr ready' ||
+  ! printf '%s' "$input" | grep -Eq -- '(--draft|[[:space:]]-d)([[:space:]"]|$)' || exit 0
 printf '%s' "$input" | grep -q 'ALLOW_NO_AUDIT=1' && exit 0
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 
@@ -20,8 +22,11 @@ lines=$(git diff "$base"..HEAD | grep -E '^\+[^+]' | grep -Ei "${AUDIT_LINES:-(c
 
 for meta in "${SECURITY_AUDIT_DIR:-$HOME/security-audit-skill}"/*/run-*/run-metadata.json; do
   [ -f "$meta" ] || continue
+  grep -Eq '"run_status"[[:space:]]*:[[:space:]]*"complete"' "$meta" || continue
   for ref in $(grep -Eo '[0-9a-f]{7,40}' "$meta"); do
-    git merge-base --is-ancestor "$ref" HEAD 2>/dev/null &&
+    ref=$(git rev-parse -q --verify "$ref^{commit}" 2>/dev/null) || continue
+    [ "$ref" != "$base" ] &&
+      git merge-base --is-ancestor "$ref" HEAD 2>/dev/null &&
       git merge-base --is-ancestor "$base" "$ref" 2>/dev/null && exit 0
   done
 done
