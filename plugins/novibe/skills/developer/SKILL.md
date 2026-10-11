@@ -31,8 +31,8 @@ the spec don't count. No runner yet? Setting it up is the first task.
    webhook); authentication, authorization, sessions, tokens or cryptography; input reaching SQL,
    a shell, a template, a path, a server-side fetch or a deserializer; one user's or tenant's
    data; secrets, CORS, cookies or TLS; a dependency, CI, release or infrastructure config; an LLM
-   prompt or tool. Then invoke `security-audit` as a full audit,
-   scoped to that diff, `quick` profile, in its default output directory — a hook holds the PR
+   prompt or tool. Then invoke `security-audit` as a full audit
+   of this repository at HEAD, scoped to the files that diff changes, `quick` profile, in its default output directory — a hook holds the PR
    back from ready until a run there covers the slice. Tests, docs, styling and
    refactors with no new behaviour warrant none — default to none. A confirmed finding is fixed test-first before the PR goes ready; one that needs
    validation goes in the PR description.

@@ -39,7 +39,10 @@ is thorough and heavy, so a slice that crosses no boundary skips it, and the PR 
 
 The plugin's `PreToolUse` hook keeps that from being skipped by mistake. It holds back
 `gh pr ready` and a non-draft `gh pr create` when the slice's diff touches boundary-looking
-paths or lines and no completed run in `~/security-audit-skill/` audited a commit on the slice. Override after asking the
+paths or lines and no run in `~/security-audit-skill/` covers it. A run covers it when it
+completed, audited this repository at a commit on the slice, and its scope includes every flagged
+file. The hook reads the command and the run's metadata with `jq`; a `--draft` or
+`ALLOW_NO_AUDIT=1` inside quoted text does not count. Override after asking the
 driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
 `AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`.
 
