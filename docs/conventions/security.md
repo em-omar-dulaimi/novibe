@@ -54,7 +54,11 @@ renames. The `hook` cases need Bash, so they run only where the eval sandbox wor
 cd plugins/novibe
 claude plugin eval . --scaffold --allow-tools Write --tag audit-decision
 claude plugin eval . --scaffold --allow-tools Bash --tag hook
+claude plugin eval . --scaffold --allow-tools Write Edit --tag full-audit --runs 1
 ```
+
+`full-audit` runs one real audit with its subagents, about $3.50 and ten minutes, so run it on
+purpose.
 
 The plugin ships `security-audit`, unmodified, from Cloudflare's
 [security-audit-skill](https://github.com/cloudflare/security-audit-skill) at

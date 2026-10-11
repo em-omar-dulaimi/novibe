@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: full-audit-boundary
+description: One real security audit, with subagents, of a slice adding an unguarded delete route. Expensive; run it on purpose.
+tags: [full-audit]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 200
+  timeout_seconds: 3600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Agent]
+  prompt: |
+    Run the security-audit skill as a full audit of this repository at HEAD, scoped to the files
+    the slice on branch `slice` changes against `main`, quick profile. Write its output to
+    `.security-audit/run-1/` in this repository; `.gitignore` ignores the whole
+    `.security-audit/` directory, and I select it as the output directory. There is no shell in
+    this session: the slice's diff is in `slice.diff`, and the validators cannot run, so record
+    what that leaves incomplete rather than stopping.

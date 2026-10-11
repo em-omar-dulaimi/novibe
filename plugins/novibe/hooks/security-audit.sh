@@ -44,7 +44,7 @@ covers() {
   target=$(jq -r '.target // empty' "$meta")
   [ -n "$target" ] && [ "$(cd "$target" 2>/dev/null && pwd -P)" = "$top" ] || return 1
   on_slice=
-  for ref in $(jq -r '.source_ref | tostring' "$meta" | grep -Eo '[0-9a-f]{7,40}'); do
+  for ref in $(jq -r '.source_ref | if type == "object" then .commit // empty else . end | tostring' "$meta" | grep -Eo '[0-9a-f]{7,40}'); do
     ref=$(git rev-parse -q --verify "$ref^{commit}" 2>/dev/null) || continue
     [ "$ref" != "$base" ] &&
       git merge-base --is-ancestor "$ref" HEAD 2>/dev/null &&
