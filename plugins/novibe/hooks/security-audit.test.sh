@@ -70,6 +70,11 @@ expect 2 "an override only in a heredoc" "$(printf 'gh pr create --body "$(cat <
 expect 0 "gh pr ready only in a heredoc" "$(printf "cat <<'EOF'\ngh pr ready\nEOF")"
 expect 0 "gh pr ready in a commit message" 'git commit -m "then gh pr ready"'
 expect 0 "another gh command" 'gh pr view'
+expect 2 "an override on another gh pr call" 'ALLOW_NO_AUDIT=1 gh pr view; gh pr ready'
+expect 2 "a wrapper with options" 'env -i gh pr ready'
+expect 2 "sudo with an option" 'sudo -u nobody gh pr ready'
+expect 2 "an escaped gh" 'g\h pr ready'
+expect 2 "<<EOF inside quotes is no heredoc" "$(printf "echo 'example <<EOF'\ngh pr ready")"
 
 head=$(git rev-parse HEAD) base=$(git merge-base origin/main HEAD)
 audit in_progress "$head" '[]' reports; expect 2 "an audit still running" 'gh pr ready'

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Hold a PR back from ready while its diff crosses a trust boundary that no finished audit has covered.
 input=$(cat)
-printf '%s' "$input" | grep -q 'gh' || exit 0
+printf '%s' "$input" | tr -d '\\' | grep -q 'gh' || exit 0
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 top=$(cd "$top" && pwd -P)
@@ -19,11 +19,13 @@ command -v jq >/dev/null || {
   exit 2
 }
 
-# Count gh pr ready/create calls with quote marks removed, so quoting cannot hide one; count the
-# exempt ones (a real --draft, or ALLOW_NO_AUDIT=1 before gh) with quoted text removed, so quoting
-# cannot fake one. Guard when the first count is larger. Heredoc bodies are skipped.
+# Count gh pr ready/create calls two ways and keep the larger count, so neither quoting nor a
+# wrapper with options can hide one: in command position with quote marks removed, and anywhere
+# outside quotes. Count the exempt ones (a real --draft, or ALLOW_NO_AUDIT=1 before gh) only
+# outside quotes, so quoting cannot fake one. Guard when there are more calls than exemptions.
+# Backslashes are dropped; heredoc bodies are skipped.
 guarded=$(printf '%s\n' "$input" | jq -r '.tool_input.command // empty' | awk '
-  function scan(line, exempting,    n, segs, s, m, tok, i, override, j, k, draft, count) {
+  function scan(line, mode,    n, segs, s, m, tok, i, override, j, k, draft, count) {
     n = split(line, segs, /;|&&|\|\||\||&|\(|\)|`|\$\(/)
     for (s = 1; s <= n; s++) {
       m = split(segs[s], tok, /[ \t]+/); i = 1; override = 0
@@ -31,10 +33,11 @@ guarded=$(printf '%s\n' "$input" | jq -r '.tool_input.command // empty' | awk '
         if (tok[i] == "ALLOW_NO_AUDIT=1") override = 1
         i++
       }
+      if (mode == "anywhere") while (i <= m && tok[i] !~ /(^|\/)gh$/) i++
       if (tok[i] !~ /(^|\/)gh$/) continue
       for (j = i + 1; j < m && tok[j] != "pr"; j++) ;
-      if (tok[j] != "pr") continue
-      if (!exempting) { if (tok[j + 1] == "ready" || tok[j + 1] == "create") count++; continue }
+      if (tok[j] != "pr" || (tok[j + 1] != "ready" && tok[j + 1] != "create")) continue
+      if (mode != "exempt") { count++; continue }
       draft = 0
       for (k = j + 2; k <= m; k++) {
         if (tok[k] == "--draft" || tok[k] == "-d" || tok[k] == "--draft=true") draft = 1
@@ -44,17 +47,23 @@ guarded=$(printf '%s\n' "$input" | jq -r '.tool_input.command // empty' | awk '
     }
     return count
   }
+  function outside(line, pos,    before) {
+    before = substr(line, 1, pos - 1)
+    return gsub(/\047/, "", before) % 2 == 0 && gsub(/"/, "", before) % 2 == 0
+  }
   heredoc != "" { t = $0; if (strip) sub(/^\t+/, "", t); if (t == heredoc) heredoc = ""; next }
   {
     line = cont $0; cont = ""
     if (line ~ /\\$/) { cont = substr(line, 1, length(line) - 1) " "; next }
-    if (match(line, /<<-?[ \t]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/)) {
+    if (match(line, /<<-?[ \t]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/) && outside(line, RSTART)) {
       heredoc = substr(line, RSTART, RLENGTH); strip = heredoc ~ /^<<-/
       sub(/^<<-?[ \t]*[\047"]?/, "", heredoc)
     }
+    gsub(/\\/, "", line)
     unquoted = line; gsub(/[\047"]/, "", unquoted)
     literal = line; gsub(/\047[^\047]*\047/, "", literal); gsub(/"[^"]*"/, "", literal); sub(/[\047"].*/, "", literal)
-    calls += scan(unquoted, 0); exempt += scan(literal, 1)
+    a = scan(unquoted, "command"); b = scan(literal, "anywhere")
+    calls += a > b ? a : b; exempt += scan(literal, "exempt")
   }
   END { if (calls > exempt) print "guard" }')
 [ -n "$guarded" ] || exit 0
