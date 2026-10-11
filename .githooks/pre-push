@@ -23,7 +23,7 @@ if [ "${ALLOW_OTHER_REFS:-}" != "1" ]; then
   fi
 fi
 
-for guard in git code gherkin likec4 phases; do
+for guard in git code gherkin likec4 adrs phases; do
   printf '%s\n' "${refs:-}" | "$here/$guard.sh" "$@" || exit 1
 done
 exit 0

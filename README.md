@@ -113,6 +113,7 @@ itself; take the ones you want:
 | [security](docs/conventions/security.md) | a commit of a file whose path looks like a credential — the one guard without an override |
 | [gherkin](docs/conventions/gherkin.md) | a feature file without an `@id:`, with an unknown tag, with comments, or naming a click, a button or an endpoint |
 | [likec4](docs/conventions/likec4.md) | an architecture model that does not validate |
+| [adrs](docs/conventions/adrs.md) | two ADRs with the same number |
 | [phases](docs/conventions/phases.md) | a `spec:` commit touching more than the spec, an `arch:` commit more than the model and ADRs, and any other commit touching either |
 | [copilot](docs/conventions/copilot.md) | — instructions that keep agent merge off the spec and the design, and review skills that flag code contradicting the architecture or creating a security problem |
 
