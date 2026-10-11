@@ -30,6 +30,25 @@ What a scanner cannot see — a new entry point without an authorization check, 
 the boundary validates it, one tenant's data reachable by another — is for review:
 [`.github/skills/security-review`](../../.github/skills/security-review/).
 
+## Before the PR goes ready
+
+The `developer` step runs Cloudflare's
+[`security-audit`](https://github.com/cloudflare/security-audit-skill) on the slice's diff, but
+only when that diff crosses a trust boundary: a new entry point, authentication, untrusted input
+reaching an interpreter, per-tenant data, secrets, dependencies or deployment config. The audit
+is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
+
+The plugin's `PreToolUse` hook keeps that from being skipped by mistake. It holds back
+`gh pr ready` and `gh pr create` when the slice's diff touches boundary-looking paths or lines and
+no run in `~/security-audit-skill/` audited a commit on the slice. Override after asking the
+driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
+`AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`. Without the skill installed, the hook
+stays out of the way.
+
+```bash
+npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global
+```
+
 ## If you add a gitleaks allowlist
 
 Anchor the patterns **and** set `regexTarget = "secret"`:
