@@ -2,39 +2,6 @@
 # Hold a PR back from ready while its diff crosses a trust boundary that no finished audit has covered.
 input=$(cat)
 printf '%s' "$input" | grep -q 'gh' || exit 0
-command -v jq >/dev/null || {
-  echo "The security-audit guard needs jq to read this command; install jq." >&2
-  exit 2
-}
-
-# Every simple command in the input, heredoc bodies and quoted text dropped: is one a guarded gh pr call?
-guarded=$(printf '%s\n' "$input" | jq -r '.tool_input.command // empty' | awk '
-  heredoc != "" { t = $0; if (strip) sub(/^\t+/, "", t); if (t == heredoc) heredoc = ""; next }
-  {
-    line = cont $0; cont = ""
-    if (line ~ /\\$/) { cont = substr(line, 1, length(line) - 1) " "; next }
-    if (match(line, /<<-?[ \t]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/)) {
-      heredoc = substr(line, RSTART, RLENGTH); strip = heredoc ~ /^<<-/
-      sub(/^<<-?[ \t]*[\047"]?/, "", heredoc)
-    }
-    gsub(/\047[^\047]*\047/, "", line); gsub(/"[^"]*"/, "", line); sub(/[\047"].*/, "", line)
-    n = split(line, segs, /;|&&|\|\||\||&|\(|\)|`/)
-    for (s = 1; s <= n; s++) {
-      m = split(segs[s], tok, /[ \t]+/); i = 1; override = 0
-      while (i <= m && (tok[i] == "" || tok[i] == "env" || tok[i] == "command" || tok[i] ~ /^[A-Za-z_][A-Za-z0-9_]*=/)) {
-        if (tok[i] == "ALLOW_NO_AUDIT=1") override = 1
-        i++
-      }
-      if (tok[i] !~ /(^|\/)gh$/) continue
-      for (j = i + 1; j < m && tok[j] != "pr"; j++) ;
-      if (tok[j] != "pr" || (tok[j + 1] != "ready" && tok[j + 1] != "create")) continue
-      draft = 0
-      for (k = j + 2; k <= m; k++) if (tok[k] == "--draft" || tok[k] == "-d" || tok[k] ~ /^--draft=/) draft = 1
-      if (tok[j + 1] == "create" && draft) continue
-      if (!override) print "guard"
-    }
-  }')
-[ -n "$guarded" ] || exit 0
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 top=$(cd "$top" && pwd -P)
@@ -46,6 +13,51 @@ for dir in "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills" "$top/.claude/skills" "$
   [ -f "$dir/security-audit/SKILL.md" ] && installed=1
 done
 [ -n "$installed" ] || exit 0
+
+command -v jq >/dev/null || {
+  echo "The security-audit guard needs jq to read this command; install jq." >&2
+  exit 2
+}
+
+# Count gh pr ready/create calls with quote marks removed, so quoting cannot hide one; count the
+# exempt ones (a real --draft, or ALLOW_NO_AUDIT=1 before gh) with quoted text removed, so quoting
+# cannot fake one. Guard when the first count is larger. Heredoc bodies are skipped.
+guarded=$(printf '%s\n' "$input" | jq -r '.tool_input.command // empty' | awk '
+  function scan(line, exempting,    n, segs, s, m, tok, i, override, j, k, draft, count) {
+    n = split(line, segs, /;|&&|\|\||\||&|\(|\)|`|\$\(/)
+    for (s = 1; s <= n; s++) {
+      m = split(segs[s], tok, /[ \t]+/); i = 1; override = 0
+      while (i <= m && (tok[i] == "" || tok[i] ~ /^(env|command|exec|time|nohup|sudo|if|then|else|elif|while|until|do|!|\{)$/ || tok[i] ~ /^[A-Za-z_][A-Za-z0-9_]*=/)) {
+        if (tok[i] == "ALLOW_NO_AUDIT=1") override = 1
+        i++
+      }
+      if (tok[i] !~ /(^|\/)gh$/) continue
+      for (j = i + 1; j < m && tok[j] != "pr"; j++) ;
+      if (tok[j] != "pr") continue
+      if (!exempting) { if (tok[j + 1] == "ready" || tok[j + 1] == "create") count++; continue }
+      draft = 0
+      for (k = j + 2; k <= m; k++) {
+        if (tok[k] == "--draft" || tok[k] == "-d" || tok[k] == "--draft=true") draft = 1
+        if (tok[k] == "--draft=false") draft = 0
+      }
+      if (override || (tok[j + 1] == "create" && draft)) count++
+    }
+    return count
+  }
+  heredoc != "" { t = $0; if (strip) sub(/^\t+/, "", t); if (t == heredoc) heredoc = ""; next }
+  {
+    line = cont $0; cont = ""
+    if (line ~ /\\$/) { cont = substr(line, 1, length(line) - 1) " "; next }
+    if (match(line, /<<-?[ \t]*[\047"]?[A-Za-z_][A-Za-z0-9_]*/)) {
+      heredoc = substr(line, RSTART, RLENGTH); strip = heredoc ~ /^<<-/
+      sub(/^<<-?[ \t]*[\047"]?/, "", heredoc)
+    }
+    unquoted = line; gsub(/[\047"]/, "", unquoted)
+    literal = line; gsub(/\047[^\047]*\047/, "", literal); gsub(/"[^"]*"/, "", literal); sub(/[\047"].*/, "", literal)
+    calls += scan(unquoted, 0); exempt += scan(literal, 1)
+  }
+  END { if (calls > exempt) print "guard" }')
+[ -n "$guarded" ] || exit 0
 
 default=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null) ||
   default=origin/$(git ls-remote --symref origin HEAD 2>/dev/null | sed -n 's|^ref: refs/heads/\(.*\)[[:space:]]HEAD$|\1|p')
