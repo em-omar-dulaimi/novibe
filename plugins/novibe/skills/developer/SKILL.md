@@ -31,12 +31,10 @@ the spec don't count. No runner yet? Setting it up is the first task.
    webhook); authentication, authorization, sessions, tokens or cryptography; input reaching SQL,
    a shell, a template, a path, a server-side fetch or a deserializer; one user's or tenant's
    data; secrets, CORS, cookies or TLS; a dependency, CI, release or infrastructure config; an LLM
-   prompt or tool. Then invoke
-   [`security-audit`](https://github.com/cloudflare/security-audit-skill) as a full audit,
+   prompt or tool. Then invoke `security-audit` as a full audit,
    scoped to that diff, `quick` profile, in its default output directory — a hook holds the PR
    back from ready until a run there covers the slice. Tests, docs, styling and
-   refactors with no new behaviour warrant none — default to none. Not installed? Tell the driver
-   and go on. A confirmed finding is fixed test-first before the PR goes ready; one that needs
+   refactors with no new behaviour warrant none — default to none. A confirmed finding is fixed test-first before the PR goes ready; one that needs
    validation goes in the PR description.
 7. **Push and mark the PR ready** — `gh pr ready`, or `gh pr create` if there is none — its
    description tied to the scenarios it satisfies, and saying which boundary was audited or why

@@ -49,6 +49,7 @@ the tests proved and the plan; [agentbox](https://github.com/novibe-org/agentbox
 | **`requirements-engineer`** | asks you, round by round, until the feature file holds *what* to build |
 | **`architect`** | asks you the same way until the C4 model holds the design; an ADR only when it matters |
 | **`developer`** | builds it test-first — red → green — until the spec's scenarios pass |
+| **`security-audit`** | [Cloudflare's](https://github.com/cloudflare/security-audit-skill) audit, run by `developer` when a slice crosses a trust boundary |
 
 ```
 /plugin marketplace add novibe-org/novibe

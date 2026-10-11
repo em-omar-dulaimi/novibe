@@ -32,8 +32,7 @@ the boundary validates it, one tenant's data reachable by another — is for rev
 
 ## Before the PR goes ready
 
-The `developer` step runs Cloudflare's
-[`security-audit`](https://github.com/cloudflare/security-audit-skill) on the slice's diff, but
+The `developer` step runs `security-audit` on the slice's diff, but
 only when that diff crosses a trust boundary: a new entry point, authentication, untrusted input
 reaching an interpreter, per-tenant data, secrets, dependencies or deployment config. The audit
 is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
@@ -42,12 +41,14 @@ The plugin's `PreToolUse` hook keeps that from being skipped by mistake. It hold
 `gh pr ready` and a non-draft `gh pr create` when the slice's diff touches boundary-looking
 paths or lines and no completed run in `~/security-audit-skill/` audited a commit on the slice. Override after asking the
 driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
-`AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`. Without the skill installed, the hook
-stays out of the way.
+`AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`.
 
-```bash
-npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global
-```
+The plugin ships `security-audit`, unmodified, from Cloudflare's
+[security-audit-skill](https://github.com/cloudflare/security-audit-skill) at
+[`c1c8a8c`](https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8),
+under its MIT licence. To update it, copy a newer `skills/security-audit/` over
+[`plugins/novibe/skills/security-audit/`](../../plugins/novibe/skills/security-audit/) and move
+this pin.
 
 ## If you add a gitleaks allowlist
 

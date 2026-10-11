@@ -7,12 +7,6 @@ printf '%s' "$input" | grep -Eq 'gh pr ready' ||
 printf '%s' "$input" | grep -q 'ALLOW_NO_AUDIT=1' && exit 0
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 
-installed=
-for dir in "$HOME/.claude/skills" .claude/skills "$HOME/.agents/skills" .agents/skills; do
-  [ -f "$dir/security-audit/SKILL.md" ] && installed=1
-done
-[ -n "$installed" ] || exit 0
-
 default=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null) ||
   default=origin/$(git ls-remote --symref origin HEAD 2>/dev/null | sed -n 's|^ref: refs/heads/\(.*\)[[:space:]]HEAD$|\1|p')
 base=$(git merge-base "$default" HEAD 2>/dev/null) || {
