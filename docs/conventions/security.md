@@ -46,6 +46,16 @@ file. The hook reads the command and the run's metadata with `jq`; a `--draft` o
 driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
 `AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`.
 
+[`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks both. The `audit-decision` cases
+check that the developer step audits a slice adding an unguarded route and skips one that only
+renames. The `hook` cases need Bash, so they run only where the eval sandbox works:
+
+```bash
+cd plugins/novibe
+claude plugin eval . --scaffold --allow-tools Write --tag audit-decision
+claude plugin eval . --scaffold --allow-tools Bash --tag hook
+```
+
 The plugin ships `security-audit`, unmodified, from Cloudflare's
 [security-audit-skill](https://github.com/cloudflare/security-audit-skill) at
 [`c1c8a8c`](https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8),

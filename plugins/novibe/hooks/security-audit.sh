@@ -28,7 +28,7 @@ base=$(git merge-base "$default" HEAD 2>/dev/null) || {
 }
 
 path_pattern="${AUDIT_PATHS:-(auth|login|session|token|crypt|secret|permission|acl|tenant|middleware|route|handler|webhook|cors|cookie|prompt|\.github/workflows/|dockerfile|\.tf$|wrangler\.|package\.json$|requirements.*\.txt$|go\.mod$|cargo\.toml$|pyproject\.toml$)}"
-line_pattern="${AUDIT_LINES:-(child_process|subprocess|exec\(|spawn\(|eval\(|innerhtml|dangerouslysetinnerhtml|pickle\.loads|yaml\.load\(|(select|insert|update|delete) .*(from|into|set|where) |verify ?= ?false|rejectunauthorized|access-control-allow|httponly|samesite|jwt|bcrypt|password)}"
+line_pattern="${AUDIT_LINES:-((app|router|server|fastify)\.(get|post|put|patch|delete|all|use|route)\(|@(app|router|bp|blueprint)\.(route|get|post|put|patch|delete)\(|@(get|post|put|patch|delete|requestmapping)(mapping)?\(|child_process|subprocess|exec\(|spawn\(|eval\(|innerhtml|dangerouslysetinnerhtml|pickle\.loads|yaml\.load\(|(select|insert|update|delete) .*(from|into|set|where) |verify ?= ?false|rejectunauthorized|access-control-allow|httponly|samesite|jwt|bcrypt|password)}"
 files=$(git diff --name-only "$base"..HEAD | while IFS= read -r file; do
   if printf '%s\n' "$file" | grep -Eiq "$path_pattern" ||
      git diff "$base"..HEAD -- "$file" | grep -E '^\+[^+]' | grep -Eiq "$line_pattern"; then
