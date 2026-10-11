@@ -26,22 +26,25 @@ description: Turn a Gherkin spec into a C4 architecture model for one slice — 
    you; ask everything someone could have decided differently. A question about behaviour is the
    spec's: hand it back to the requirements step, never settle it in the model.
 3. **ADR only if warranted** — an integration pattern, a security boundary, build versus reuse,
-   repo structure: plain [MADR](https://adr.github.io/madr/), kept short, next number in
-   `docs/adrs/`. Default to none. What a scenario already says is not an ADR decision; an ADR
-   carries only the why beyond one feature.
+   repo structure: a decision that binds features not yet written. Default to none; never
+   package a feature as an ADR. A choice the driver made for this slice is answered in the model,
+   not recorded again; what a scenario already says is not an ADR decision either. Think one is
+   warranted? Ask the driver first, recommending none. Then plain
+   [MADR](https://adr.github.io/madr/), kept short, next number in `docs/adrs/`.
 4. **Push** — once no question is open and the driver agrees: commit as `arch: …` to the slice's
    branch and push.
 
 ## Rules for the model
 
 - Views follow [arc42](https://arc42.org/overview/); its goals and quality live in `features/`,
-  its decisions in `docs/adrs/`.
+  its cross-cutting decisions in `docs/adrs/`.
 - A box with parts of its own gets a view at the next level.
 - A building-block view holds its subject's children and their direct neighbours. No element
   appears at two levels in one view.
 - A runtime view holds only the elements that take a step.
 - **Say a fact once.** A description says what an element is, in one sentence. What it does to
-  another element is a relation. How a story runs is a runtime view. Why is an ADR.
+  another element is a relation. How a story runs is a runtime view. Why one feature is built
+  this way needs no record; why every feature must be is an ADR.
 - An ADR names the views it shaped, by view id; the model never names an ADR.
 - Applications share no storage; one reaches another only through its API.
 - Model your own parts. A library you use is a technology line; a package you write is a
