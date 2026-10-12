@@ -12,7 +12,7 @@ fi
 # Lint the ADRs as committed, by the lint rules as committed.
 tree=$(mktemp -d "${TMPDIR:-/tmp}/nvadrs.XXXXXX")
 found=$(mktemp "${TMPDIR:-/tmp}/nvadrs.XXXXXX")
-git archive HEAD "$adrs" .madrlintrc.json | tar -x -C "$tree"
+git archive HEAD | tar -x -C "$tree"
 lint=$(pwd)/node_modules/.bin/madr-lint
 (cd "$tree" && "$lint" "$adrs") >"$found" 2>&1
 status=$?

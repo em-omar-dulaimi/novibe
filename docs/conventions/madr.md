@@ -13,10 +13,12 @@ it is installed: MADR 4's required sections, status and date, the file name, a n
 to override.
 
 ```
-npm i -D madr-lint
+npm i -D -E madr-lint@0.4.2
 npx madr-lint docs/adrs
 ```
 
 ADRs written before the linter can be snapshotted in a
 [baseline](https://knktkc.github.io/madr-lint/guides/adopting-existing-repo/), so only new ones
-have to lint.
+have to lint: commit `.madr-lint/baseline.json` — the guard lints the whole committed tree, so it
+sees the baseline and every link target — and ignore `.madr-lint/cache`. madr-lint is young, so it
+is pinned to the release this guard was tested with.
