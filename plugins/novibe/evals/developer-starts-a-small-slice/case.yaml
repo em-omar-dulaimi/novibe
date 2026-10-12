@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: developer-starts-a-small-slice
+tags: [slice-size]
+runs: 3
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Write]
+  prompt: |
+    Run the developer step for the slice on branch `slice` of this repository. There is no
+    driver and no shell in this session: where you would ask the driver something, write it into
+    `outcome.md` instead, and you cannot run tests, push or run `gh`. Decide whether you start
+    building this slice, then write `outcome.md`: its first line is `START` if you start, else
+    `STOP`; after it, what you would tell the driver. Stop there — this run checks only the decision.
+graders:
+  - name: decided-start
+    type: regex
+    target: { source: file, path: outcome.md }
+    pattern: "^START\\b"
+  - name: names-the-slice
+    type: llm
+    focus: { source: file, path: outcome.md }
+    criteria: |
+      PASS only if every point holds; otherwise FAIL.
+
+      1. It starts building: it does not ask the driver to cut the slice smaller.
+      2. It names the slice as the 30-day rule — the refund on day 12 and the refusal on day 31.
+      3. It leaves the three `@backlog` partial-refund scenarios out of this slice.
+
+      A description that refuses the slice as too big, or plans to build the partial refunds, is FAIL.
