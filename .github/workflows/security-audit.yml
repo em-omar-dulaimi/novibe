@@ -4,28 +4,20 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review, edited]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   recorded:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: A ready PR that crosses a trust boundary records its security audit
+      - name: The PR records its security audit, or why none was needed
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          DRAFT: ${{ github.event.pull_request.draft }}
           PR_BODY: ${{ github.event.pull_request.body }}
-          AUDIT_PATHS: ${{ vars.AUDIT_PATHS }}
-          AUDIT_LINES: ${{ vars.AUDIT_LINES }}
-        run: sh .github/security-audit/check.sh
-
-  check-tested:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: sh .github/security-audit/check.test.sh
+        run: |
+          printf '%s\n' "$PR_BODY" | tr -d '\r' |
+            grep -Eiq '^[[:space:]>*_-]*security audit:[*_]*[[:space:]]*[^[:space:]]' && exit 0
+          echo "The PR description records no security audit. Add a line of its own:"
+          echo "  Security audit: <the boundary audited, and what the audit found>"
+          echo "  Security audit: none — <why this slice crosses no trust boundary>"
+          exit 1

@@ -39,10 +39,9 @@ the spec don't count. No runner yet? Setting it up is the first task.
    security-audit --global` — and go on. A confirmed finding is fixed test-first before the PR goes ready; one that needs
    validation goes in the PR description.
 7. **Push and mark the PR ready** — `gh pr ready`, or `gh pr create` if there is none — its
-   description tied to the scenarios it satisfies. A slice that crosses a trust boundary records
-   its audit in the description on a line of its own — `Security audit: <the boundary, and what
-   the audit found>`, or `Security audit: none — <why not>` — which a required check on GitHub
-   reads before the PR can merge.
+   description tied to the scenarios it satisfies, and recording step 6's decision on a line of
+   its own — `Security audit: <the boundary, and what the audit found>`, or `Security audit:
+   none — <why not>`. A required check on GitHub reads it before the PR can merge.
 
 **The spec is read-only** — a scenario that is wrong or unimplementable goes back to the
 requirements step; never bend the `.feature` file. Scenarios not built in this slice keep their

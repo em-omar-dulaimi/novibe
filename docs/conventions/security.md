@@ -38,24 +38,21 @@ only when that diff crosses a trust boundary: a new entry point, authentication,
 reaching an interpreter, per-tenant data, secrets, dependencies or deployment config. The audit
 is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
 
-**A required check on GitHub keeps it from being skipped.** Every repository that develops the
-NoVibe way and wants this safety copies
-[`.github/workflows/security-audit.yml`](../../.github/workflows/security-audit.yml) and
-[`.github/security-audit/`](../../.github/security-audit/), and makes the `recorded` job a
-required status check in its ruleset. On a ready PR whose diff touches boundary-looking paths or
-lines, the check fails until the PR description has a line of its own:
+**A required check on GitHub keeps it from being skipped.** The `developer` step records its
+decision in the PR description, on a line of its own, and
+[`.github/workflows/security-audit.yml`](../../.github/workflows/security-audit.yml) checks that
+every ready PR has it:
 
 ```
 Security audit: the delete entry point — no confirmed findings
-Security audit: none — the route is behind the admin guard
+Security audit: none — docs only
 ```
 
-Drafts and PRs that cross no boundary pass without one. Editing the description runs the check
-again. It holds whoever makes the PR ready — Claude, a person, the web UI — and calls no model,
-so it costs nothing. It checks that the audit was recorded, not that it ran; running it is the
-`developer` step's job. To match your codebase, set the repository variables `AUDIT_PATHS` and
-`AUDIT_LINES` (extended regexes). [`check.test.sh`](../../.github/security-audit/check.test.sh)
-keeps the cases it must get right, and CI runs it.
+The judgment stays with the `developer` step; the check only reads that it was made and written
+down. Drafts are skipped, and editing the description runs it again. It holds whoever makes the
+PR ready — Claude, a person, the web UI — and calls no model. Every repository that develops the
+NoVibe way and wants this safety copies the workflow and makes `recorded` a required status check
+in its ruleset.
 
 [`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks the developer step's judgment. The `audit-decision` cases
 check that the developer step audits a slice adding an unguarded route and skips one that only
