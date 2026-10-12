@@ -28,8 +28,8 @@ description: Turn a Gherkin spec into a C4 architecture model for one slice — 
 3. **ADR only if warranted** — an integration pattern, a security boundary, build versus reuse,
    repo structure: a decision that binds features not yet written. Default to none; never
    package a feature as an ADR. A choice the driver made for this slice is answered in the model,
-   not recorded again; what a scenario already says is not an ADR decision either. Think one is
-   warranted? Ask the driver first, recommending none. Then plain
+   not recorded again; what a scenario already says is not an ADR decision either. A decision that
+   is cross-cutting? Recommend the ADR and ask the driver first. Then plain
    [MADR](https://adr.github.io/madr/), kept short, next number in `docs/adrs/`.
 4. **Push** — once no question is open and the driver agrees: commit as `arch: …` to the slice's
    branch and push.
