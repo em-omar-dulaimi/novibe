@@ -11,6 +11,7 @@ here first. **Take what you want**; every guard stands alone.
 | [Code](code.md) | comments state a constraint the code cannot express | [`.githooks/pre-push.d/code.sh`](../../.githooks/pre-push.d/code.sh) |
 | [Gherkin](gherkin.md) | what a feature file carries, and the tag vocabulary | [`.githooks/pre-push.d/gherkin.sh`](../../.githooks/pre-push.d/gherkin.sh), [`.gherkin-lintrc`](../../.gherkin-lintrc) |
 | [LikeC4](likec4.md) | the architecture model validates | [`.githooks/pre-push.d/likec4.sh`](../../.githooks/pre-push.d/likec4.sh) |
+| [MADR](madr.md) | an ADR is plain MADR, with a number of its own | [`.githooks/pre-push.d/madr.sh`](../../.githooks/pre-push.d/madr.sh), [`.madrlintrc.json`](../../.madrlintrc.json) |
 | [Phases](phases.md) | a commit is spec, design or code — never a mix | [`.githooks/pre-push.d/phases.sh`](../../.githooks/pre-push.d/phases.sh) |
 | [Copilot](copilot.md) | Copilot ships without touching the spec or the design, and reviews for architecture and security | [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), [`.github/skills/`](../../.github/skills/) |
 | [Security](security.md) | a credential is never committed in the first place | [`.githooks/pre-commit.d/security.sh`](../../.githooks/pre-commit.d/security.sh) |
