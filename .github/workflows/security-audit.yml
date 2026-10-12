@@ -1,0 +1,31 @@
+name: security-audit
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  recorded:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: A ready PR that crosses a trust boundary records its security audit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          AUDIT_PATHS: ${{ vars.AUDIT_PATHS }}
+          AUDIT_LINES: ${{ vars.AUDIT_LINES }}
+        run: sh .github/security-audit/check.sh
+
+  check-tested:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh .github/security-audit/check.test.sh

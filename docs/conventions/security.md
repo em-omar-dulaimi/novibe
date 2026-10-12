@@ -38,29 +38,32 @@ only when that diff crosses a trust boundary: a new entry point, authentication,
 reaching an interpreter, per-tenant data, secrets, dependencies or deployment config. The audit
 is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
 
-The plugin's `PreToolUse` hook keeps that from being skipped by mistake. It holds back
-`gh pr ready` and a non-draft `gh pr create` when the slice's diff touches boundary-looking
-paths or lines and no run in `~/security-audit-skill/` covers it. A run covers it when it
-completed, audited this repository at a commit on the slice, and its scope includes every flagged
-file. The hook reads the command and the run's metadata with `jq`; a `--draft` or
-`ALLOW_NO_AUDIT=1` inside quoted text does not count. Override after asking the
-driver with `ALLOW_NO_AUDIT=1 gh pr …`. To match your codebase, set `AUDIT_PATHS` and
-`AUDIT_LINES` (extended regexes), or `SECURITY_AUDIT_DIR`.
+**A required check on GitHub keeps it from being skipped.** Every repository that develops the
+NoVibe way and wants this safety copies
+[`.github/workflows/security-audit.yml`](../../.github/workflows/security-audit.yml) and
+[`.github/security-audit/`](../../.github/security-audit/), and makes the `recorded` job a
+required status check in its ruleset. On a ready PR whose diff touches boundary-looking paths or
+lines, the check fails until the PR description has a line of its own:
 
-[`security-audit.test.sh`](../../plugins/novibe/hooks/security-audit.test.sh) keeps every way the
-hook has been found wrong, from a route in an ordinary file to a quoted `gh pr "ready"`. CI runs
-it on every change to the hook. The hook guards against an agent forgetting the audit, not against
-someone set on evading it, so it errs toward blocking; it is not a shell parser, and
-`bash -c "gh pr ready"` gets past it.
+```
+Security audit: the delete entry point — no confirmed findings
+Security audit: none — the route is behind the admin guard
+```
+
+Drafts and PRs that cross no boundary pass without one. Editing the description runs the check
+again. It holds whoever makes the PR ready — Claude, a person, the web UI — and calls no model,
+so it costs nothing. It checks that the audit was recorded, not that it ran; running it is the
+`developer` step's job. To match your codebase, set the repository variables `AUDIT_PATHS` and
+`AUDIT_LINES` (extended regexes). [`check.test.sh`](../../.github/security-audit/check.test.sh)
+keeps the cases it must get right, and CI runs it.
 
 [`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks the developer step's judgment. The `audit-decision` cases
 check that the developer step audits a slice adding an unguarded route and skips one that only
-renames. The `hook` cases need Bash, so they run only where the eval sandbox works:
+renames.
 
 ```bash
 cd plugins/novibe
 claude plugin eval . --scaffold --allow-tools Write --tag audit-decision
-claude plugin eval . --scaffold --allow-tools Bash --tag hook
 ```
 
 NoVibe does not ship the skill; install it from Cloudflare, and update it the same way:
@@ -69,7 +72,7 @@ NoVibe does not ship the skill; install it from Cloudflare, and update it the sa
 npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global
 ```
 
-Without it, the hook stays out of the way and the `developer` step says how to install it.
+Without it, the `developer` step says how to install it.
 
 ## If you add a gitleaks allowlist
 

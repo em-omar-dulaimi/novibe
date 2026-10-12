@@ -110,7 +110,7 @@ itself; take the ones you want:
 |---|---|
 | [git](docs/conventions/git.md) | a push to a merged or closed pull request, and a branch stacked on another open one |
 | [code](docs/conventions/code.md) | a diff that is mostly added comments |
-| [security](docs/conventions/security.md) | a commit of a file whose path looks like a credential — the one guard without an override |
+| [security](docs/conventions/security.md) | a commit of a file whose path looks like a credential — the one guard without an override — and, on GitHub, merging a ready PR that crosses a trust boundary without recording its security audit |
 | [gherkin](docs/conventions/gherkin.md) | a feature file without an `@id:`, with an unknown tag, with comments, or naming a click, a button or an endpoint |
 | [likec4](docs/conventions/likec4.md) | an architecture model that does not validate |
 | [phases](docs/conventions/phases.md) | a `spec:` commit touching more than the spec, an `arch:` commit more than the model and ADRs, and any other commit touching either |
@@ -131,6 +131,7 @@ Adopting them means copying from where each file already lives:
 | [`.gherkin-lintrc`](.gherkin-lintrc) | the feature-file lint |
 | [`.claude/settings.json`](.claude/settings.json) | the hook that turns the guards on, and the plugin |
 | [`.github/copilot-instructions.md`](.github/copilot-instructions.md), [`.github/skills/`](.github/skills/) | Copilot's instructions and review skills |
+| [`.github/workflows/security-audit.yml`](.github/workflows/security-audit.yml), [`.github/security-audit/`](.github/security-audit/) | the check that a PR crossing a trust boundary records its security audit — make it a required check |
 
 [`docs/conventions/`](docs/conventions/) says what each rule is for.
 
