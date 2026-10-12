@@ -31,7 +31,7 @@ the spec don't count. No runner yet? Setting it up is the first task.
    prompt or tool. Then run [`security-audit`](https://github.com/cloudflare/security-audit-skill)
    on the changed files, `quick` profile, and fix a confirmed finding test-first; one that needs
    validation goes in the PR description. Otherwise none — the default for tests, docs and
-   refactors. Not installed? Say so, and go on.
+   refactors. Not installed? Stop and ask the driver: install it, or record why not.
 7. **Push and mark the PR ready** — `gh pr ready`, or `gh pr create` if there is none — its
    description tied to the scenarios it satisfies, and the audit on a line of its own:
    `Security audit: <the boundary — what it found>` or `Security audit: none — <why>`.

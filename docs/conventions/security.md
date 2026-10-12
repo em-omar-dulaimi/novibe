@@ -41,7 +41,7 @@ is thorough and heavy, so a slice that crosses no boundary skips it, and the PR 
 **A required check on GitHub keeps it from being skipped.** The `developer` step records its
 decision in the PR description, on a line of its own, and
 [`.github/workflows/security-audit.yml`](../../.github/workflows/security-audit.yml) checks that
-every ready PR has it:
+every ready PR has it, with a real reason or result — not a bare `none` or the template:
 
 ```
 Security audit: the delete entry point — no confirmed findings
