@@ -26,12 +26,13 @@ Then ask Claude to build something *the NoVibe way*.
 
 | | You | The agent |
 |---|---|---|
-| **1 · Specify** | answer, one round at a time | asks until a Gherkin feature file holds what to build |
-| **2 · Design** | decide | asks until a LikeC4 model holds the design; an ADR only for a cross-cutting decision |
-| **3 · Build** | watch the scenarios turn green | writes the tests first — the feature file *is* the test |
-| **4 · Ship** | review the spec and the design, not a thousand lines of diff | git hooks and a required check refuse what the conventions forbid |
+| **1&nbsp;·&nbsp;Specify** | answer, one round at a time | asks until a Gherkin feature file holds what to build |
+| **2&nbsp;·&nbsp;Design** | decide | asks until a LikeC4 model holds the design; an ADR only for a cross-cutting decision |
+| **3&nbsp;·&nbsp;Build** | watch the scenarios turn green | writes the tests first — the feature file *is* the test |
+| **4&nbsp;·&nbsp;Ship** | review the spec and the design, not a thousand lines of diff | git hooks and a required check refuse what the conventions forbid |
 
 > **Vibe coding:** describe it, ship it, audit what the machine made — trapped in review hell.
+>
 > **NoVibe:** you author the spec and the design; the machine builds to them, and the executable spec proves it.
 
 ## ✨ What you get
