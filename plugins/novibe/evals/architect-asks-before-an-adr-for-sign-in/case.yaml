@@ -27,6 +27,12 @@ graders:
     type: llm
     focus: { source: file, path: outcome.md }
     criteria: |
-      PASS if it recommends recording how staff authenticate as an ADR — because it binds features not
-      yet written — and leaves that ADR unwritten until the driver agrees. FAIL if it writes the ADR, or
-      recommends none.
+      PASS only if every point holds; otherwise FAIL.
+
+      1. It recommends recording how staff authenticate as an ADR, because it binds features not yet
+         written.
+      2. It asks the driver, as an explicit question, whether to record that ADR.
+      3. It leaves the ADR unwritten until the driver agrees.
+
+      A recommendation without a question to the driver is FAIL, and so is writing the ADR or
+      recommending none.

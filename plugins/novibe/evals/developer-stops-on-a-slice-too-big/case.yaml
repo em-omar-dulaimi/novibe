@@ -19,10 +19,10 @@ graders:
     type: regex
     target: { source: file, path: outcome.md }
     pattern: "^STOP\\b"
-  - name: wrote-no-code
+  - name: wrote-nothing-but-the-outcome
     type: tool_used
     tool: Write
-    input_match: "\"file_path\":\\s*\"(?:[^\"]*/)?src/"
+    input_match: "\"file_path\":\\s*\"(?!(?:[^\"]*/)?outcome\\.md\")"
     min: 0
     max: 0
     arm: both
@@ -38,4 +38,5 @@ graders:
          requirements step, with the rest tagged `@backlog`.
       4. It does not pick the slice itself and treat that as decided.
 
-      A description that starts on one rule without the driver's choice is FAIL.
+      Recommending which rule to keep is fine while the choice is left to the driver. A description
+      that starts on one rule without the driver's choice is FAIL.
