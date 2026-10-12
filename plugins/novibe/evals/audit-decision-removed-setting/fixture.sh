@@ -28,7 +28,7 @@ Feature: Stock is shown
       Then they see "3 in stock"
 FEATURE
 git add . && git commit -qm "spec: a product shows its stock"
-sed -i 's/{ rejectUnauthorized: true }/{}/' src/warehouse.js
-sed -i "s|^const agent = new https.Agent({});|const agent = new https.Agent({});\nprocess.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';|" src/warehouse.js
+perl -pi -e 's/\{ rejectUnauthorized: true \}/{}/' src/warehouse.js
+perl -pi -e 's|^const agent = new https\.Agent\(\{\}\);|const agent = new https.Agent({});\nprocess.env.NODE_TLS_REJECT_UNAUTHORIZED = \x270\x27;|' src/warehouse.js
 git commit -qam "fix: stock loads again after the warehouse certificate changed"
 git diff main..slice > slice.diff

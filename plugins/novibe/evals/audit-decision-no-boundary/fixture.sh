@@ -48,6 +48,6 @@ Feature: Read a user
       Then the user's details are returned
 FEATURE
 git add . && git commit -qm "spec: a user is read by id"
-sed -i 's/store/usersById/g' src/users.js
+perl -pi -e 's/store/usersById/g' src/users.js
 git add . && git commit -qm "refactor: the store says what it is keyed by"
 git diff main..slice > slice.diff

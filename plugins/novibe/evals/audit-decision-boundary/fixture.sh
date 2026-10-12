@@ -56,6 +56,6 @@ module.exports = {
   remove: (id) => store.delete(id),
 };
 JS
-sed -i "s|^module.exports = app;|app.delete('/users/:id', (req, res) => { users.remove(req.params.id); res.status(204).end(); });\nmodule.exports = app;|" src/server.js
+perl -pi -e 's|^module\.exports = app;|app.delete(\x27/users/:id\x27, (req, res) => { users.remove(req.params.id); res.status(204).end(); });\nmodule.exports = app;|' src/server.js
 git add . && git commit -qm "feat: an admin deletes a user"
 git diff main..slice > slice.diff
