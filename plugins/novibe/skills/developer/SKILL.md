@@ -26,22 +26,15 @@ the spec don't count. No runner yet? Setting it up is the first task.
 3. **Minimal implementation → green.**
 4. **Refactor** with the scenario green, and commit.
 5. **Repeat** until every scenario is green or tagged `@backlog`.
-6. **Audit only if warranted** — read the slice's diff against the default branch. Does it
-   cross a trust boundary? A new or changed entry point (route, handler, command, consumer,
-   webhook); authentication, authorization, sessions, tokens or cryptography; input reaching SQL,
-   a shell, a template, a path, a server-side fetch or a deserializer; one user's or tenant's
-   data; secrets, CORS, cookies or TLS; a dependency, CI, release or infrastructure config; an LLM
-   prompt or tool. Then invoke
-   [`security-audit`](https://github.com/cloudflare/security-audit-skill) as a full audit
-   of this repository at HEAD, scoped to the files that diff changes, `quick` profile, in its default output directory. Tests, docs, styling and
-   refactors with no new behaviour warrant none — default to none. Not installed? Tell the driver
-   how — `npx skills add https://github.com/cloudflare/security-audit-skill --skill
-   security-audit --global` — and go on. A confirmed finding is fixed test-first before the PR goes ready; one that needs
-   validation goes in the PR description.
+6. **Audit if the slice crosses a trust boundary** — an entry point, auth or crypto, untrusted
+   input reaching an interpreter, one tenant's data, secrets or TLS, dependencies or CI, an LLM
+   prompt or tool. Then run [`security-audit`](https://github.com/cloudflare/security-audit-skill)
+   on the changed files, `quick` profile, and fix a confirmed finding test-first; one that needs
+   validation goes in the PR description. Otherwise none — the default for tests, docs and
+   refactors. Not installed? Say so, and go on.
 7. **Push and mark the PR ready** — `gh pr ready`, or `gh pr create` if there is none — its
-   description tied to the scenarios it satisfies, and recording step 6's decision on a line of
-   its own — `Security audit: <the boundary, and what the audit found>`, or `Security audit:
-   none — <why not>`. A required check on GitHub reads it before the PR can merge.
+   description tied to the scenarios it satisfies, and the audit on a line of its own:
+   `Security audit: <the boundary — what it found>` or `Security audit: none — <why>`.
 
 **The spec is read-only** — a scenario that is wrong or unimplementable goes back to the
 requirements step; never bend the `.feature` file. Scenarios not built in this slice keep their
