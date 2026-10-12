@@ -110,7 +110,7 @@ itself; take the ones you want:
 |---|---|
 | [git](docs/conventions/git.md) | a push to a merged or closed pull request, and a branch stacked on another open one |
 | [code](docs/conventions/code.md) | a diff that is mostly added comments |
-| [security](docs/conventions/security.md) | a commit of a file whose path looks like a credential — the one guard without an override |
+| [security](docs/conventions/security.md) | a commit of a file whose path looks like a credential — the one guard without an override — and, on GitHub, merging a ready PR that does not record its security audit decision |
 | [gherkin](docs/conventions/gherkin.md) | a feature file without an `@id:`, with an unknown tag, with comments, or naming a click, a button or an endpoint |
 | [likec4](docs/conventions/likec4.md) | an architecture model that does not validate |
 | [madr](docs/conventions/madr.md) | an ADR that is not MADR, or that shares its number with another |
@@ -133,6 +133,7 @@ Adopting them means copying from where each file already lives:
 | [`.madrlintrc.json`](.madrlintrc.json) | the ADR lint |
 | [`.claude/settings.json`](.claude/settings.json) | the hook that turns the guards on, and the plugin |
 | [`.github/copilot-instructions.md`](.github/copilot-instructions.md), [`.github/skills/`](.github/skills/) | Copilot's instructions and review skills |
+| [`.github/workflows/security-audit.yml`](.github/workflows/security-audit.yml) | the check that a ready PR records its security audit decision — make it a required check |
 
 [`docs/conventions/`](docs/conventions/) says what each rule is for.
 

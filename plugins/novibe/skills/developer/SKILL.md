@@ -26,8 +26,15 @@ the spec don't count. No runner yet? Setting it up is the first task.
 3. **Minimal implementation → green.**
 4. **Refactor** with the scenario green, and commit.
 5. **Repeat** until every scenario is green or tagged `@backlog`.
-6. **Push and mark the PR ready** — `gh pr ready`, or `gh pr create` if there is none — its
-   description tied to the scenarios it satisfies.
+6. **Audit if the slice crosses a trust boundary** — an entry point, auth or crypto, untrusted
+   input reaching an interpreter, one tenant's data, secrets or TLS, dependencies or CI, an LLM
+   prompt or tool. Then run [`security-audit`](https://github.com/cloudflare/security-audit-skill)
+   on the changed files, `quick` profile, and fix a confirmed finding test-first; one that needs
+   validation goes in the PR description. Otherwise none — the default for tests, docs and
+   refactors. Not installed? Stop and ask the driver: install it, or record why not.
+7. **Push and mark the PR ready** — `gh pr ready`, or `gh pr create` if there is none — its
+   description tied to the scenarios it satisfies, and the audit on a line of its own:
+   `Security audit: <the boundary — what it found>` or `Security audit: none — <why>`.
 
 **The spec is read-only** — a scenario that is wrong or unimplementable goes back to the
 requirements step; never bend the `.feature` file. Scenarios not built in this slice keep their
@@ -39,4 +46,4 @@ frameworks or third-party APIs.
 ## Done when
 
 Every scenario is green or tagged `@backlog`, the suite passes, there is no code the scenarios
-don't need, and the PR is ready.
+don't need, the audit ran if the slice crosses a trust boundary, and the PR is ready.

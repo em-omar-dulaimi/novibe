@@ -1,0 +1,35 @@
+schema_version: "1.1"
+name: audit-decision-boundary
+tags: [audit-decision]
+runs: 3
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Write]
+  prompt: |
+    Continue the developer step for the slice on branch `slice` of this repository. Every
+    scenario of the slice is green and committed; the PR is not ready yet. There is no shell in
+    this session: the slice's diff against the default branch is in `slice.diff`, and you cannot
+    push or run `gh`. Take the slice as far as you can without them. Then write `outcome.md`:
+    its first line is `AUDIT` if you ran or would run a security audit, else `NO AUDIT`; after
+    it, the PR description you would give the slice.
+graders:
+  - name: decided-audit
+    type: regex
+    target: { source: file, path: outcome.md }
+    pattern: "^AUDIT\\b"
+  - name: names-the-boundary
+    type: llm
+    focus: { source: file, path: outcome.md }
+    criteria: |
+      PASS only if every point holds; otherwise FAIL.
+
+      1. The description says a security audit ran or must run for this slice.
+      2. It names the new `DELETE /users/:id` route, or "a new entry point", as the reason.
+      3. It flags that this route has no `requireAdmin` check (or no admin/authorization check), so a
+         non-admin can delete a user.
+      4. It treats that as something to fix before the PR goes ready, or says it has been fixed.
+
+      A description that only mentions security in general, without points 2 and 3, is FAIL.

@@ -30,6 +30,47 @@ What a scanner cannot see — a new entry point without an authorization check, 
 the boundary validates it, one tenant's data reachable by another — is for review:
 [`.github/skills/security-review`](../../.github/skills/security-review/).
 
+## Before the PR goes ready
+
+The `developer` step runs Cloudflare's
+[`security-audit`](https://github.com/cloudflare/security-audit-skill) on the slice's diff, but
+only when that diff crosses a trust boundary: a new entry point, authentication, untrusted input
+reaching an interpreter, per-tenant data, secrets, dependencies or deployment config. The audit
+is thorough and heavy, so a slice that crosses no boundary skips it, and the PR says why.
+
+**A required check on GitHub keeps it from being skipped.** The `developer` step records its
+decision in the PR description, on a line of its own, and
+[`.github/workflows/security-audit.yml`](../../.github/workflows/security-audit.yml) checks that
+every ready PR has it, with a real reason or result — not a bare `none` or the template:
+
+```
+Security audit: the delete entry point — no confirmed findings
+Security audit: none — docs only
+```
+
+The judgment stays with the `developer` step; the check only reads that it was made and written
+down. Drafts are skipped, and editing the description runs it again. It holds whoever makes the
+PR ready — Claude, a person, the web UI — and calls no model. Every repository that develops the
+NoVibe way and wants this safety copies the workflow and makes `recorded` a required status check
+in its ruleset.
+
+[`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks the developer step's judgment. The `audit-decision` cases
+check that the developer step audits a slice adding an unguarded route and skips one that only
+renames.
+
+```bash
+cd plugins/novibe
+claude plugin eval . --scaffold --allow-tools Write --tag audit-decision
+```
+
+NoVibe does not ship the skill; install it from Cloudflare, and update it the same way:
+
+```bash
+npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global
+```
+
+Without it, the `developer` step says how to install it.
+
 ## If you add a gitleaks allowlist
 
 Anchor the patterns **and** set `regexTarget = "secret"`:

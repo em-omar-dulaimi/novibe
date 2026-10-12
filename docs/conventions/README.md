@@ -14,7 +14,7 @@ here first. **Take what you want**; every guard stands alone.
 | [MADR](madr.md) | an ADR is plain MADR, with a number of its own | [`.githooks/pre-push.d/madr.sh`](../../.githooks/pre-push.d/madr.sh), [`.madrlintrc.json`](../../.madrlintrc.json) |
 | [Phases](phases.md) | a commit is spec, design or code — never a mix | [`.githooks/pre-push.d/phases.sh`](../../.githooks/pre-push.d/phases.sh) |
 | [Copilot](copilot.md) | Copilot ships without touching the spec or the design, and reviews for architecture and security | [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), [`.github/skills/`](../../.github/skills/) |
-| [Security](security.md) | a credential is never committed in the first place | [`.githooks/pre-commit.d/security.sh`](../../.githooks/pre-commit.d/security.sh) |
+| [Security](security.md) | a credential is never committed in the first place, and every slice records whether it needed a security audit | [`.githooks/pre-commit.d/security.sh`](../../.githooks/pre-commit.d/security.sh), [`.github/workflows/security-audit.yml`](../../.github/workflows/security-audit.yml) |
 
 ## Adopting
 
