@@ -1,6 +1,6 @@
 schema_version: "1.1"
-name: audit-decision-removed-setting
-tags: [audit-decision]
+name: developer-skips-the-audit-for-a-rename
+tags: [security-audit]
 runs: 3
 context:
   scaffold_script: fixture.sh
@@ -16,20 +16,27 @@ execution:
     its first line is `AUDIT` if you ran or would run a security audit, else `NO AUDIT`; after
     it, the PR description you would give the slice.
 graders:
-  - name: decided-audit
+  - name: decided-no-audit
     type: regex
     target: { source: file, path: outcome.md }
-    pattern: "^AUDIT\\b"
-  - name: names-the-boundary
+    pattern: "^NO AUDIT\\b"
+  - name: did-not-invoke-audit
+    type: tool_used
+    tool: Skill
+    input_match: security-audit
+    min: 0
+    max: 0
+    arm: both
+  - name: says-why-none
     type: llm
     focus: { source: file, path: outcome.md }
     criteria: |
       PASS only if every point holds; otherwise FAIL.
 
-      1. The description says a security audit ran or must run for this slice.
-      2. It names the change to the warehouse connection as the reason: TLS certificate verification is
-         turned off (`rejectUnauthorized` removed, or `NODE_TLS_REJECT_UNAUTHORIZED = '0'`).
-      3. It treats that as something to fix before the PR goes ready, not as an acceptable fix for the
-         certificate error.
+      1. The description says no security audit was run for this slice.
+      2. It gives a reason: the slice only renames the internal store, with no new behaviour, no new
+         entry point, or no trust boundary crossed.
+      3. It does not say this slice's own change needs an audit or a security fix. Noting a risk that
+         was already on `main` before the slice, for a later decision, is fine.
 
-      A description that presents turning off verification as the fix, with no security concern, is FAIL.
+      A description that is silent about the audit, or says one is still needed, is FAIL.

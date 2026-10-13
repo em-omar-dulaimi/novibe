@@ -5,7 +5,7 @@ repository the agent works in. The name says what the skill is expected to do.
 
 | Tag | What it checks |
 |---|---|
-| `audit-decision` | the developer audits a slice that crosses a trust boundary, and skips one that does not |
+| `security-audit` | the developer audits a slice that crosses a trust boundary, and skips one that does not |
 | `slice-size` | the developer stops on a slice too big to build at once, and starts a small one |
 | `adr` | the architect keeps a feature out of ADRs, and asks before an ADR for a cross-cutting decision |
 
