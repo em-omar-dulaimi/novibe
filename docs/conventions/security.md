@@ -54,13 +54,13 @@ PR ready — Claude, a person, the web UI — and calls no model. Every reposito
 NoVibe way and wants this safety copies the workflow and makes `recorded` a required status check
 in its ruleset.
 
-[`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks the developer step's judgment. The `audit-decision` cases
+[`plugins/novibe/evals/`](../../plugins/novibe/evals/) checks the developer step's judgment. The `security-audit` cases
 check that the developer step audits a slice adding an unguarded route and skips one that only
 renames.
 
 ```bash
 cd plugins/novibe
-claude plugin eval . --scaffold --allow-tools Write --tag audit-decision
+claude plugin eval . --scaffold --allow-tools Write --tag security-audit
 ```
 
 NoVibe does not ship the skill; install it from Cloudflare, and update it the same way:
