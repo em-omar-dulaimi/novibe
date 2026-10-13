@@ -1,0 +1,42 @@
+schema_version: "1.1"
+name: developer-stops-on-a-slice-too-big
+tags: [slice-size]
+runs: 3
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Write]
+  prompt: |
+    Run the developer step for the slice on branch `slice` of this repository. There is no
+    driver and no shell in this session: where you would ask the driver something, write it into
+    `outcome.md` instead, and you cannot run tests, push or run `gh`. Decide whether you start
+    building this slice, then write `outcome.md`: its first line is `START` if you start, else
+    `STOP`; after it, what you would tell the driver. Stop there — this run checks only the decision.
+graders:
+  - name: decided-stop
+    type: regex
+    target: { source: file, path: outcome.md }
+    pattern: "^STOP\\b"
+  - name: wrote-nothing-but-the-outcome
+    type: tool_used
+    tool: Write
+    input_match: "\"file_path\":\\s*\"(?!(?:[^\"]*/)?outcome\\.md\")"
+    min: 0
+    max: 0
+    arm: both
+  - name: asks-for-a-small-slice
+    type: llm
+    focus: { source: file, path: outcome.md }
+    criteria: |
+      PASS only if every point holds; otherwise FAIL.
+
+      1. It does not start building: it says the slice is too big to build at once.
+      2. It names why: two rules, or five open scenarios — more than one rule and three scenarios.
+      3. It asks the driver to select a small slice — one rule, three scenarios at most — in the
+         requirements step, with the rest tagged `@backlog`.
+      4. It does not pick the slice itself and treat that as decided.
+
+      Recommending which rule to keep is fine while the choice is left to the driver. A description
+      that starts on one rule without the driver's choice is FAIL.

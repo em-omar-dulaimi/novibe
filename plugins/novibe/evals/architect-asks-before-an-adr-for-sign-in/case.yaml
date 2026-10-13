@@ -1,0 +1,38 @@
+schema_version: "1.1"
+name: architect-asks-before-an-adr-for-sign-in
+tags: [adr]
+runs: 3
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Write]
+  prompt: |
+    Run the architect step for the slice on branch `slice` of this repository. There is no
+    driver and no shell in this session: where you would ask the driver, write the question and
+    your recommendation into `outcome.md`. Where the model needs an answer, carry on as you
+    recommend; anything the skill says needs the driver's yes first, leave undone. Write the files
+    you would write. `outcome.md` lists every file you wrote and every question you would have
+    asked.
+graders:
+  - name: wrote-no-adr-unasked
+    type: tool_used
+    tool: Write
+    input_match: "\"file_path\":\\s*\"(?:[^\"]*/)?docs/adrs/"
+    min: 0
+    max: 0
+    arm: both
+  - name: asks-before-an-adr
+    type: llm
+    focus: { source: file, path: outcome.md }
+    criteria: |
+      PASS only if every point holds; otherwise FAIL.
+
+      1. It recommends recording how staff authenticate as an ADR, because it binds features not yet
+         written.
+      2. It asks the driver, as an explicit question, whether to record that ADR.
+      3. It leaves the ADR unwritten until the driver agrees.
+
+      A recommendation without a question to the driver is FAIL, and so is writing the ADR or
+      recommending none.
