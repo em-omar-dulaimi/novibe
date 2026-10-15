@@ -1,7 +1,7 @@
 # Copilot
 
-**Copilot ships the pull request, not the decisions behind it.** Agent merge answers review
-comments, fixes failing checks and merges; without being told, it would as happily edit a
+**Copilot ships the pull request, not the decisions behind it.** Agent merge fixes what blocks
+the pull request and merges; without being told, it would as happily edit a
 scenario to turn a check green.
 
 **Copilot code review looks where the risk is.** `security-review` follows untrusted input
