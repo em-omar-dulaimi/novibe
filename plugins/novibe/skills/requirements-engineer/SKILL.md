@@ -78,20 +78,41 @@ CSV a partner imports).
 **[BRIEF](https://cucumber.io/blog/bdd/keep-your-scenarios-brief/) scenarios** — business
 language, real data, only the details that matter, one rule each. Five steps or fewer, one `When`–`Then` pair.
 
-**No value in it, no example in it** — a scenario whose steps name only categories (*"a device in
-another organisation"*, *"a subscriber outside"*) is a rule restated, not an example of one. Put
-the value the driver gave you in the step: *`"A"`*, *`"B"`*, *`3`*, a number they actually use.
+**Build the World early** — the World is what the scenarios run in, Cucumber's term; your runner
+may call it `context` (behave), `ScenarioContext` (Reqnroll) or fixtures (pytest-bdd). The first
+slices set up one end-to-end world: the organisation, its people and its things, with names and
+values modelled on the driver's real cases — synthetic, never a customer's data. People appear by
+role or a made-up number, never a person's name, which invites copying a real one in. Later
+scenarios name its things, never placeholders. A scenario someone outside the team cannot picture
+is fluffy: rewrite it from the World.
+
+**No value in it, no example in it** — a step that names only a category is a rule restated, not
+an example of one. Name the World's thing instead:
+
+| A rule restated | An example |
+|---|---|
+| `Given a product that is out of stock` | `Given the shop has 0 "Classic Kettle 1.7 l" left` |
+| `Given a customer from abroad` | `Given customer 10042 ships to Vienna, Austria` |
+
 Keep values short enough to read; where the real one is long, name the thing and let the
 `Background` carry the value.
 
-**A `Then` is what someone can see** — name what the sender, the device or the operator observes,
-not a verdict the system reached internally. *"the message is refused"* says nothing about whether
-the sender was told or the message vanished, and those are different products; *"the sender is
-told they may not send there, and nothing reaches the device"* says which one was built.
+**The field's terms** — write in the domain's standard words (*a refund*, *a backorder*), never
+an invented or generic one (*a negative order*, *a pending item*, *an entity*). The driver's own
+word wins where they have one: a standard is a suggestion, never a gate. Unsure which term? Offer two
+or three candidates with their source and ask; never pick silently.
+
+**A `Then` is what someone can see** — name what the customer, the shop owner or the courier
+observes, not a verdict the system reached internally. *"the order is refused"* says nothing about
+whether the customer was told or the order vanished, and those are different products; *"customer
+10042 is told the Classic Kettle is sold out, and no order is placed"* says which one was built. Test each
+phrase: what would the reader do differently after seeing it? Nothing — drop it.
 
 **The role is someone outside** — the person a scenario serves is whoever gains from it: a
-customer, a subscriber, an operator on call. Never the system, never the team, never a component.
-*"As the operator of the SMSC I want an SRI4SM"* is a design wish wearing a role's clothes.
+customer, a shop owner, a courier on shift. Never the system, never the team, never a component.
+*"As the payment service I want a webhook"* is a design wish wearing a role's clothes.
+Before adding an outcome, ask who needs it: one that only a caller's convenience needs belongs in
+the caller, not the product.
 
 **One scenario per outcome** — two ways to reach the same outcome are one scenario; a scenario that
 follows necessarily from another is ceremony; something a user will notice with no scenario is a
@@ -107,7 +128,11 @@ at most, never complicated setup.
 
 **`Scenario Outline:` only for the same behaviour with different values** — every cell a value
 (`failed`, `"EUR"`, `3`), never a phrase, a condition or a step; few rows, chosen with care. Rows
-that do different things are separate scenarios.
+that do different things are separate scenarios. A table of unrelated rules is a list of rules,
+not an outline — and a new rule never joins an old mixed table.
+
+**Removing or loosening a rule changes it everywhere** — list every scenario, table row, ADR
+sentence and skill line that names it, and change them in the same slice.
 
 **Folders are feature domains** — what the system does, in the driver's language; never an epic,
 never a technical layer. Epics are transient and live in the driver's planning tool.
@@ -122,4 +147,6 @@ Picking up a `@backlog` feature or scenario means removing the tag here.
 
 ## Done when
 
-No question is open, the driver agrees the spec, and has selected the small slice to build.
+No question is open, the driver agrees the spec, and has selected the small slice to build. A
+rule removed or loosened? The driver has answered whether data already stored breaks under it,
+before the architect step.

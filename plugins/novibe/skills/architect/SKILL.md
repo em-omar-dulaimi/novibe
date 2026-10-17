@@ -50,6 +50,8 @@ description: "Place one slice in the C4 model (LikeC4) by interviewing the drive
 - Model your own parts. A library you use is a technology line; a package you write is a
   `library`.
 - Where the system is headed is a view on this model, never a second model.
+- **Names come from the field's standard** — offer two or three candidate terms with their
+  source and ask; never pick silently. Prefer one source, but meaning beats source.
 
 ## Layout
 
