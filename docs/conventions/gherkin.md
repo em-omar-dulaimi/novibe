@@ -28,16 +28,16 @@ whatever you will really filter on. A rewrite needs several of its own, and the
 
 ## The linter
 
-[`StefanStuehrmann/gherkin-lint-plus`](https://github.com/StefanStuehrmann/gherkin-lint-plus),
-from its git URL rather than npm:
+[`@novibe-org/gherkin-lint-plus`](https://github.com/novibe-org/gherkin-lint-plus), our fork of
+[`krrish377/gherkin-lint-plus`](https://github.com/krrish377/gherkin-lint-plus):
 
 ```sh
-npm i -D github:StefanStuehrmann/gherkin-lint-plus
+npm i -D @novibe-org/gherkin-lint-plus
 npx gherkin-lint-plus -c .gherkin-lintrc features
 ```
 
 It carries `required-feature-tags`, `no-dupe-feature-tags` and `no-comments`, which the rest of
-the flow depends on. They were offered upstream; that pull request is still open months later.
+the flow depends on.
 
 `pre-push` runs it when the linter is installed and there is a `features/` directory —
 `FEATURES_DIR` if yours is elsewhere, `ALLOW_LINT=1` to override.
