@@ -61,11 +61,6 @@ the tests proved and the plan; [agentbox](https://github.com/novibe-org/agentbox
 | **`architect`** | asks you the same way until the C4 model holds the design; an ADR only when it matters |
 | **`developer`** | builds it test-first — red → green — until the spec's scenarios pass |
 
-```text
-/plugin marketplace add novibe-org/novibe
-/plugin install novibe
-```
-
 ## 🚀 Use
 
 Ask Claude to build something **the NoVibe way** (or invoke `novibe`). It walks the flow one
@@ -80,8 +75,8 @@ contract; code is their consequence. Give each slice its own session:
    decisions in your prompt, or it builds what you wrote instead of what was reviewed.
 4. **Ship** it — turn on
    [agent merge](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests#merging-a-pull-request)
-   in the GitHub Copilot app: it answers review comments, fixes failing checks and merge
-   conflicts, and merges once GitHub allows. Turning it on is your decision to merge.
+   in the GitHub Copilot app: it reads the pull request, fixes what blocks it, and merges as soon
+   as GitHub allows. Turning it on is your decision to merge.
 
 Only need one part? Invoke `requirements-engineer`, `architect`, or `developer` directly.
 Skip NoVibe for trivial edits.
@@ -115,11 +110,12 @@ itself — when your tool is connected. More of this will be automated.
 A skill is guidance: an agent follows it most of the time, not every time. What has to hold every
 time is enforced by a git hook instead — deterministic, whatever the agent made of its skill, and
 just as much for fast merges and machine-written diffs. These are the guards this repository uses
-itself; take the ones you want:
+itself; take the ones you want. Each guard stands alone and takes an explicit override — except
+the credential-path check:
 
 | | Refuses |
 |---|---|
-| [git](docs/conventions/git.md) | a push to a merged or closed pull request, and a branch stacked on another open one |
+| [git](docs/conventions/git.md) | a push to a merged or closed pull request, a rewrite of a branch whose pull request is open, and a branch stacked on another open one |
 | [code](docs/conventions/code.md) | a diff that is mostly added comments |
 | [security](docs/conventions/security.md) | a commit of a file whose path looks like a credential — the one guard without an override — and, on GitHub, merging a ready PR that does not record its security audit decision |
 | [gherkin](docs/conventions/gherkin.md) | a feature file without an `@id:`, with an unknown tag, with comments, or naming a click, a button or an endpoint |
