@@ -52,8 +52,9 @@ slice; the first slice builds it.
 requirements step; never bend the `.feature` file. Scenarios not built in this slice keep their
 `@backlog` tag.
 
-**Names come from the field's standard** — offer two or three candidate terms with their source and
-ask; never pick silently. Meaning beats source.
+**Code takes the spec's and the model's words** — types, functions and step definitions alike, by
+the [ubiquitous language](../../references/ubiquitous-language.md). A concept they don't name takes
+the field's term; unsure which, offer two or three with their source and ask.
 
 **Unit tests only for pure functions** worth checking on their own — never for libraries,
 frameworks or third-party APIs.

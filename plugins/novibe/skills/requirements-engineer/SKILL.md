@@ -97,10 +97,10 @@ an example of one. Name the World's thing instead:
 Keep values short enough to read; where the real one is long, name the thing and let the
 `Background` carry the value.
 
-**The field's terms** — write in the domain's standard words (*a refund*, *a backorder*), never
-an invented or generic one (*a negative order*, *a pending item*, *an entity*). The driver's own
-word wins where they have one: a standard is a suggestion, never a gate. Unsure which term? Offer two
-or three candidates with their source and ask; never pick silently.
+**The spec decides the words** — the model and the code take them over, by the [ubiquitous
+language](../../references/ubiquitous-language.md). Before using a word, search `features/` and the
+model for the one already in use for that concept; a new term is asked for first, with two or three
+candidates and their source.
 
 **A `Then` is what someone can see** — name what the customer, the shop owner or the courier
 observes, not a verdict the system reached internally. *"the order is refused"* says nothing about
@@ -131,11 +131,16 @@ at most, never complicated setup.
 that do different things are separate scenarios. A table of unrelated rules is a list of rules,
 not an outline — and a new rule never joins an old mixed table.
 
+**A feature names the user's goal as a term of their field** — plain before precise:
+`find-knowledge`, `knowledge-capture` (KCS), `authentication`. Never a sentence or a phrase made
+of the driver's words (`i-tell-the-system-what-i-know`, `share-what-was-learned`), never a gerund
+(`telling`); the same for a folder.
+
 **Removing or loosening a rule changes it everywhere** — list every scenario, table row, ADR
 sentence and skill line that names it, and change them in the same slice.
 
-**Folders are feature domains** — what the system does, in the driver's language; never an epic,
-never a technical layer. Epics are transient and live in the driver's planning tool.
+**Folders are feature domains** — what the system does; never an epic, never a technical layer.
+Epics are transient and live in the driver's planning tool.
 
 **Every feature carries an `@id:`** — the ticket in the driver's planning tool (`@id:<ticket>`);
 a scenario planned on its own carries its own. No tool? Kebab-case, named for the behaviour, not
