@@ -29,6 +29,9 @@ In Claude Code, open `/plugin` and find **NoVibe** under Discover. Or from the t
 claude plugin install novibe --marketplace novibe-org/novibe
 ```
 
+In each repository that works the NoVibe way, add a `.novibe.yml` at its root; a comment is enough:
+`# This repository works the NoVibe way`.
+
 ## Skills and agents
 
 | Invoke | What it does for you |
@@ -47,11 +50,14 @@ claude plugin install novibe --marketplace novibe-org/novibe
 Only need one part? Invoke `requirements-engineer`, `architect`, or `developer` directly. Skip
 NoVibe for trivial edits.
 
+In a repository with a `.novibe.yml` at its root, a `SessionStart` hook tells each session which skill
+a spec, the architecture or code goes through, so a request that names the fix doesn't skip it.
+
 ## What it touches
 
 The skills are plain `SKILL.md` instructions, and the reviewer agents plain agent files that
-read and report, never change. The plugin ships no MCP server, hook or script, and sends nothing
-anywhere of its own. `security-review` runs Cloudflare's `security-audit`: installing NoVibe from
+read and report, never change. Its one hook prints that reminder and nothing else; the plugin
+ships no MCP server, and sends nothing anywhere of its own. `security-review` runs Cloudflare's `security-audit`: installing NoVibe from
 its marketplace installs it too; from the Directory, install it with
 `npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global`. It works through the tools your session already has: files
 in your repository, and a planning tool such as Jira only if you connected one.
