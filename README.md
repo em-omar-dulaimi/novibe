@@ -74,6 +74,7 @@ subscription, and fixes what they find before the PR goes ready.
 |---|---|
 | **`security-review`** | a slice that crosses a trust boundary, with Cloudflare's [`security-audit`](https://github.com/cloudflare/security-audit-skill) |
 | **`architecture-review`** | a slice that changed the C4 model or an ADR: its code against them |
+| **`clean-code-review`** | a slice that changed code: by Clean Code's heuristics, each finding cited by its ID |
 
 ## 🚀 Use
 
