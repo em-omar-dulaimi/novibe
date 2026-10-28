@@ -62,6 +62,17 @@ good it looks, and accepting it is the only way they will ever find out what you
    **Ask only what the product does** — how the spec is written (folders, the split into
    features, wording) is yours, by the rules below; how it gets built is the architect's. The id
    is the driver's: ask for the ticket the slice is planned under.
+
+   **Nobody in the session knows? Park it, don't guess** — the driver knows some answers and not
+   others. For an answer nobody present can give, look first where it may already be written: the
+   ticket and what it links to, `features/`, and for how another system behaves today, that
+   system's code or docs — never this system's code, which shows what exists, not what should.
+   Still open? Record it as an item in the planning tool, a child of the feature's ticket, assigned
+   to the person who knows, and name it in one line under `Feature:` (*Open question: can a
+   shipped order be cancelled? See PROJ-12.*). No tool connected? Give the driver the question
+   and its owner to plan. The rule it decides gets no scenario until the answer is in; the known
+   rules are specified, and the slice is picked from them. Nothing the driver has not said is
+   written as if they had — not as a scenario, not as an assumption in the file.
 3. **Push and open a draft PR** — re-read the file against the rules below and raise what you find
    as one last round. When the driver agrees: commit as `spec: …` on
    the session's branch (or `feat/<slug>`), push, `gh pr create --draft`. It stays draft until the
@@ -153,6 +164,7 @@ Picking up a `@backlog` feature or scenario means removing the tag here.
 
 ## Done when
 
-No question is open, the driver agrees the spec, and has selected the small slice to build. A
-rule removed or loosened? The driver has answered whether data already stored breaks under it,
-before the architect step.
+No question is open that someone in the session could answer; what nobody present knows is an
+item with an owner, and no scenario rests on it. The driver agrees the spec, and has selected the
+small slice to build. A rule removed or loosened? The driver has answered whether data already
+stored breaks under it, before the architect step.

@@ -29,6 +29,12 @@ description: "Place one slice in the C4 model (LikeC4) by interviewing the drive
    you; ask only what changes the structure: a new element, who talks to whom, the mechanism
    between them, where something runs. A question about behaviour is the spec's: hand it back to
    the requirements step, never settle it in the model.
+
+   **Nobody in the session can decide? Park it, don't guess** — record the decision as an item in
+   the planning tool, a child of the slice's ticket, assigned to the person who can make it; no
+   tool connected, give the driver the question and its owner to plan. Place only what is decided:
+   the element it concerns waits for the answer, and nothing is modelled as if the driver had
+   chosen.
 3. **ADR only if warranted** — default to none. Before writing one, ask: would a later slice
    decide differently without it? If not, there is no ADR. Never one that says how a feature
    behaves; a choice the driver made for this slice is answered in the model, not recorded again.
@@ -70,5 +76,6 @@ description: "Place one slice in the C4 model (LikeC4) by interviewing the drive
 
 ## Done when
 
-No question is open, the driver agrees the model places the slice, and an ADR exists only if a
-crucial decision was made — often none.
+No question is open that someone in the session could decide; a decision parked with an owner has
+left its element out of the model. The driver agrees the model places the slice, and an ADR exists
+only if a crucial decision was made — often none.
